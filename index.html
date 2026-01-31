@@ -24,6 +24,7 @@
             overflow: hidden;
         }
 
+        /* The Card */
         .container {
             background: var(--parchment);
             border: 5px solid var(--guild-gold);
@@ -31,62 +32,61 @@
             border-radius: 15px;
             box-shadow: 0 0 30px rgba(249, 168, 37, 0.4);
             max-width: 400px;
-            width: 90%;
+            width: 85%;
             text-align: center;
             position: relative;
             z-index: 10;
         }
 
-        /* The Fix: Hide all steps by default */
-        .step {
-            display: none;
+        /* --- CHARACTER FADE LOGIC --- */
+        .character-img {
+            position: fixed;
+            bottom: 0;
+            height: 70vh; /* Adjust height based on your image size */
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+            pointer-events: none;
+            z-index: 5;
         }
 
-        /* Only show the active step */
-        .active {
-            display: block !important;
+        #natsu-img { left: -50px; transform: translateX(-50px); }
+        #erza-img { right: -50px; transform: translateX(50px); }
+
+        /* When we reach Step 3, these classes will trigger via JS */
+        .show-character {
+            opacity: 0.8; /* Slight transparency to look magical */
+            transform: translateX(0) !important;
         }
 
-        h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.4rem; margin-top: 0; }
-        p { line-height: 1.5; }
-        
-        .disclaimer { 
-            font-size: 0.7rem; 
-            color: #7f8c8d; 
-            margin-bottom: 15px; 
-            font-weight: bold; 
-            display: block;
-            text-decoration: underline;
-        }
+        /* --- END CHARACTER LOGIC --- */
 
-        #countdown { font-weight: bold; color: var(--fire-red); margin: 15px 0; font-family: monospace; font-size: 1.2rem; }
-        
+        .step { display: none; }
+        .active { display: block !important; }
+        h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.4rem; }
         button {
             display: block; width: 100%; padding: 14px; margin: 10px 0;
             border: 2px solid var(--guild-gold); background: white;
             color: var(--fire-red); font-weight: bold; border-radius: 8px;
-            cursor: pointer; font-family: inherit; font-size: 1rem;
+            cursor: pointer; font-family: inherit;
         }
-        button:hover { background: var(--guild-gold); color: white; transform: scale(1.02); }
+        button:hover { background: var(--guild-gold); color: white; }
 
         .floating-heart {
             position: fixed; bottom: -50px; color: #ff4d6d; opacity: 0.6; z-index: 1;
             animation: floatUp 4s linear forwards;
         }
-        @keyframes floatUp {
-            to { transform: translateY(-110vh) rotate(360deg); }
-        }
+        @keyframes floatUp { to { transform: translateY(-110vh) rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="player" style="position: absolute; top: -9999px;"></div>
+    <img src="natsu.png" id="natsu-img" class="character-img" alt="Natsu Style">
+    <img src="erza.png" id="erza-img" class="character-img" alt="Erza Style">
 
     <div class="container">
         
         <div id="step-0" class="step active">
             <h1>Wait a second... 👆</h1>
-            <p>No, I'm not ordering my food today.</p>
             <p>I'm ordering for later:<br><strong>14th February 2026</strong></p>
             <button onclick="goToStep(1)">Alrite genius</button>
         </div>
@@ -100,7 +100,6 @@
 
         <div id="step-2" class="step">
             <h1>Guild Feast Selection 🍗</h1>
-            <p>What are we eating?</p>
             <button onclick="selectFood('Steak')">🥩 Steak</button>
             <button onclick="selectFood('Sashimi')">🍣 Sashimi Bowl</button>
             <button onclick="selectFood('Pasta')">🍝 Pasta</button>
@@ -114,86 +113,65 @@
         </div>
 
         <div id="step-4" class="step">
-            <span class="disclaimer">If you didn't choose steak, please skip this</span>
             <h1>The Pierre Special 🍷</h1>
-            <p>PIERRE has a special set menu (Rp1.1 mio). I can't afford it alone... can we use our savings for this?</p>
-            <button onclick="goToStep(5)">Skip (to answer the disclaimer)</button>
+            <p>Rp1.1 mio/set. Can we use our savings?</p>
+            <button onclick="goToStep(5)">Skip</button>
             <button onclick="goToStep(5)">Sure, let's splurge!</button>
-            <button onclick="goToStep(5)">Let's have a good food experience</button>
+            <button onclick="goToStep(5)">Let's have good food experience</button>
         </div>
 
         <div id="step-5" class="step">
             <h1>It's a Quest! 📜</h1>
-            <p>Selection recorded. See you on the 14th!</p>
-            <p style="font-size: 2.5rem; margin: 10px 0;">❤️🔥👆</p>
+            <p>Selection recorded. ❤️🔥👆</p>
         </div>
     </div>
 
     <script>
         let chosenFood = "";
+        const audio = new Audio('valentine.mp3');
 
-// 1. Setup the Audio Object
-// This looks for a file named "valentine.mp3" in your GitHub folder
-const audio = new Audio('valentine.mp3');
-audio.volume = 1.0; 
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-' + stepNumber).classList.add('active');
 
-// 2. Navigation Logic
-function goToStep(stepNumber) {
-    const allSteps = document.querySelectorAll('.step');
-    allSteps.forEach(step => step.classList.remove('active'));
+            // --- FADE IN CHARACTERS ON STEP 3 ---
+            if(stepNumber === 3) {
+                document.getElementById('natsu-img').classList.add('show-character');
+                document.getElementById('erza-img').classList.add('show-character');
+            } else {
+                // Fade them out if we move to Step 4 or 5
+                document.getElementById('natsu-img').classList.remove('show-character');
+                document.getElementById('erza-img').classList.remove('show-character');
+            }
+        }
 
-    const target = document.getElementById('step-' + stepNumber);
-    if (target) {
-        target.classList.add('active');
-    }
-}
+        function startExperience() {
+            audio.play().catch(e => console.log("Audio waiting for interaction"));
+            goToStep(2);
+            createHearts();
+        }
 
-// 3. The "YES" Trigger (Much more reliable)
-function startExperience() {
-    // Play the MP3
-    audio.play().catch(error => {
-        console.log("Audio failed to play automatically, usually needs a click.");
-    });
-    
-    goToStep(2);
-    createHearts();
-}
+        function selectFood(food) {
+            chosenFood = food;
+            goToStep(3);
+        }
 
-function selectFood(food) {
-    chosenFood = food;
-    goToStep(3);
-}
+        function selectOutfit() {
+            chosenFood === 'Steak' ? goToStep(4) : goToStep(5);
+        }
 
-function selectOutfit() {
-    if (chosenFood === 'Steak') {
-        goToStep(4);
-    } else {
-        goToStep(5);
-    }
-}
-
-function createHearts() {
-    for(let i=0; i<15; i++) {
-        setTimeout(() => {
-            const heart = document.createElement('div');
-            heart.className = 'floating-heart';
-            heart.innerHTML = '❤️';
-            heart.style.left = Math.random() * 100 + 'vw';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 4000);
-        }, i * 300);
-    }
-}
-
-// 4. Update Countdown
-(function updateCountdown() {
-    const vDay = new Date("February 14, 2026 00:00:00").getTime();
-    const now = new Date().getTime();
-    const diff = vDay - now;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const el = document.getElementById("countdown");
-    if(el) el.innerHTML = days > 0 ? `${days} DAYS REMAINING` : "HAPPY VALENTINE'S DAY!";
-})();
+        function createHearts() {
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const h = document.createElement('div');
+                    h.className = 'floating-heart';
+                    h.innerHTML = '❤️';
+                    h.style.left = Math.random() * 100 + 'vw';
+                    document.body.appendChild(h);
+                    setTimeout(() => h.remove(), 4000);
+                }, i * 300);
+            }
+        }
     </script>
 </body>
 </html>
