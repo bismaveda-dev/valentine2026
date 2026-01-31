@@ -5,6 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>A Wizard's Valentine Request</title>
     
+    <script>
+        // --- THE BRAIN (Now at the top for safety) ---
+        
+        let chosenFood = "";
+        // We create the audio object safely
+        const audio = new Audio('valentine.mp3');
+        audio.volume = 1.0; 
+
+        function goToStep(stepNumber) {
+            console.log("Going to step: " + stepNumber); // Debugging message
+
+            // 1. Hide all steps
+            const allSteps = document.querySelectorAll('.step');
+            allSteps.forEach(step => step.classList.remove('active'));
+
+            // 2. Show the target step
+            const target = document.getElementById('step-' + stepNumber);
+            if (target) {
+                target.classList.add('active');
+            } else {
+                console.error("Step " + stepNumber + " not found!");
+            }
+
+            // 3. Image Logic (With Safety Checks)
+            const natsu = document.getElementById('natsu-img');
+            const erza = document.getElementById('erza-img');
+
+            // Only try to move images if they actually exist
+            if (natsu && erza) {
+                if(stepNumber === 3) {
+                    natsu.classList.add('show-character');
+                    erza.classList.add('show-character');
+                } else {
+                    natsu.classList.remove('show-character');
+                    erza.classList.remove('show-character');
+                }
+            }
+        }
+
+        function startExperience() {
+            // Try to play audio, but don't stop if it fails
+            audio.play().catch(error => {
+                console.log("Audio waiting for interaction.");
+            });
+            goToStep(2);
+            createHearts();
+        }
+
+        function selectFood(food) {
+            chosenFood = food;
+            goToStep(3);
+        }
+
+        function selectOutfit() {
+            if (chosenFood === 'Steak') {
+                goToStep(4);
+            } else {
+                goToStep(5);
+            }
+        }
+
+        function createHearts() {
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'floating-heart';
+                    heart.innerHTML = '❤️';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 4000);
+                }, i * 300);
+            }
+        }
+    </script>
+
     <style>
         :root {
             --guild-gold: #f9a825;
@@ -20,7 +95,6 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            /* Fix for mobile browser address bar jumps */
             min-height: 100dvh; 
             margin: 0;
             overflow: hidden;
@@ -32,49 +106,33 @@
             padding: 2rem;
             border-radius: 15px;
             box-shadow: 0 0 30px rgba(249, 168, 37, 0.4);
-            max-width: 320px; /* Safe mobile width */
+            max-width: 320px;
             width: 85%;
             text-align: center;
             position: relative;
             z-index: 10;
-            /* CRITICAL: Allows images to stick out of the box */
             overflow: visible; 
         }
 
         /* --- SAFE IMAGE LOGIC --- */
         .character-img {
-            position: absolute; /* Sticks to the Card, not the screen */
+            position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 130px; /* Adjusted size for mobile balance */
+            width: 130px; 
             opacity: 0;
             transition: opacity 0.5s ease, transform 0.5s ease;
-            pointer-events: none; /* Clicks go through the image */
-            z-index: 20; /* Sits on top of the card border */
+            pointer-events: none;
+            z-index: 20; 
         }
 
-        /* Stick Natsu to the TOP edge of the card */
-        #natsu-img {
-            top: -110px; 
-        }
+        #natsu-img { top: -110px; }
+        #erza-img { bottom: -110px; }
 
-        /* Stick Erza to the BOTTOM edge of the card */
-        #erza-img {
-            bottom: -110px;
-        }
-
-        /* Animation when they appear */
-        .show-character {
-            opacity: 1 !important;
-        }
+        .show-character { opacity: 1 !important; }
         
-        #natsu-img.show-character {
-            transform: translate(-50%, -10px); /* Pop up slightly */
-        }
-        #erza-img.show-character {
-            transform: translate(-50%, 10px); /* Pop down slightly */
-        }
-        /* ------------------------ */
+        #natsu-img.show-character { transform: translate(-50%, -10px); }
+        #erza-img.show-character { transform: translate(-50%, 10px); }
 
         .step { display: none; }
         .active { display: block !important; }
@@ -83,12 +141,8 @@
         p { line-height: 1.5; }
         
         .disclaimer { 
-            font-size: 0.7rem; 
-            color: #7f8c8d; 
-            margin-bottom: 15px; 
-            font-weight: bold; 
-            display: block;
-            text-decoration: underline;
+            font-size: 0.7rem; color: #7f8c8d; margin-bottom: 15px; 
+            font-weight: bold; display: block; text-decoration: underline;
         }
 
         #countdown { font-weight: bold; color: var(--fire-red); margin: 15px 0; font-family: monospace; font-size: 1.2rem; }
@@ -98,7 +152,7 @@
             border: 2px solid var(--guild-gold); background: white;
             color: var(--fire-red); font-weight: bold; border-radius: 8px;
             cursor: pointer; font-family: inherit; font-size: 1rem;
-            -webkit-tap-highlight-color: transparent; /* iPhone tap fix */
+            -webkit-tap-highlight-color: transparent;
         }
         button:hover { background: var(--guild-gold); color: white; transform: scale(1.02); }
 
@@ -124,21 +178,10 @@
 
         <div id="step-1" class="step">
             <h1>Will you be my valentine? ❤️</h1>
-            <div id="countdown">14 DAYS REMAINING</div>
+            <div id="countdown">Calculating...</div>
             <button onclick="startExperience()">Yes</button>
             <button onclick="startExperience()">YESS Please!!</button>
         </div>
 
         <div id="step-2" class="step">
             <h1>Guild Feast Selection 🍗</h1>
-            <p>What are we eating?</p>
-            <button onclick="selectFood('Steak')">🥩 Steak</button>
-            <button onclick="selectFood('Sashimi')">🍣 Sashimi Bowl</button>
-            <button onclick="selectFood('Pasta')">🍝 Pasta</button>
-        </div>
-
-        <div id="step-3" class="step">
-            <h1>Choose Your Armor ⚔️</h1>
-            <p>Natsu (Top) or Erza (Bottom)?</p>
-            <button onclick="selectOutfit()">Natsu: Clean smart casual look</button>
-            <button onclick="selectOutfit()">Erza:
