@@ -24,50 +24,66 @@
             overflow: hidden;
         }
 
-        /* The Card */
         .container {
             background: var(--parchment);
             border: 5px solid var(--guild-gold);
             padding: 2rem;
             border-radius: 15px;
             box-shadow: 0 0 30px rgba(249, 168, 37, 0.4);
-            max-width: 400px;
+            max-width: 350px;
             width: 85%;
             text-align: center;
             position: relative;
-            z-index: 10;
+            z-index: 10; /* Card stays on top of images */
         }
 
-        /* --- CHARACTER FADE LOGIC --- */
+        /* --- CHARACTER VERTICAL LAYOUT --- */
         .character-img {
             position: fixed;
-            bottom: 0;
-            height: 70vh; /* Adjust height based on your image size */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px; /* Adjust based on your image aspect ratio */
             opacity: 0;
-            transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+            transition: all 1s ease-in-out;
             pointer-events: none;
             z-index: 5;
         }
 
-        #natsu-img { left: -50px; transform: translateX(-50px); }
-        #erza-img { right: -50px; transform: translateX(50px); }
-
-        /* When we reach Step 3, these classes will trigger via JS */
-        .show-character {
-            opacity: 0.8; /* Slight transparency to look magical */
-            transform: translateX(0) !important;
+        /* Natsu at the Top */
+        #natsu-img {
+            top: -20px;
+            transform: translate(-50%, -50px);
         }
 
-        /* --- END CHARACTER LOGIC --- */
+        /* Erza at the Bottom */
+        #erza-img {
+            bottom: -20px;
+            transform: translate(-50%, 50px);
+        }
 
+        /* Reveal Logic */
+        .show-character {
+            opacity: 1;
+        }
+        
+        #natsu-img.show-character {
+            transform: translate(-50%, 0);
+        }
+
+        #erza-img.show-character {
+            transform: translate(-50%, 0);
+        }
+
+        /* --- UI COMPONENTS --- */
         .step { display: none; }
         .active { display: block !important; }
-        h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.4rem; }
+        h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.3rem; margin-bottom: 15px; }
+        
         button {
             display: block; width: 100%; padding: 14px; margin: 10px 0;
             border: 2px solid var(--guild-gold); background: white;
             color: var(--fire-red); font-weight: bold; border-radius: 8px;
-            cursor: pointer; font-family: inherit;
+            cursor: pointer; font-family: inherit; font-size: 0.9rem;
         }
         button:hover { background: var(--guild-gold); color: white; }
 
@@ -84,7 +100,6 @@
     <img src="erza.png" id="erza-img" class="character-img" alt="Erza Style">
 
     <div class="container">
-        
         <div id="step-0" class="step active">
             <h1>Wait a second... 👆</h1>
             <p>I'm ordering for later:<br><strong>14th February 2026</strong></p>
@@ -107,17 +122,17 @@
 
         <div id="step-3" class="step">
             <h1>Choose Your Armor ⚔️</h1>
-            <p>How are we appearing at the guild?</p>
+            <p>Natsu (Top) or Erza (Bottom)?</p>
             <button onclick="selectOutfit()">Natsu: Clean smart casual look</button>
             <button onclick="selectOutfit()">Erza: Crop, sexy, hot, ready to mingle</button>
         </div>
 
         <div id="step-4" class="step">
-            <h1>The Pierre Special 🍷</h1>
-            <p>Rp1.1 mio/set. Can we use our savings?</p>
+            <h1 style="font-size: 1.1rem;">The Pierre Special 🍷</h1>
+            <p style="font-size: 0.9rem;">Rp1.1 mio/set. Use our savings?</p>
             <button onclick="goToStep(5)">Skip</button>
             <button onclick="goToStep(5)">Sure, let's splurge!</button>
-            <button onclick="goToStep(5)">Let's have good food experience</button>
+            <button onclick="goToStep(5)">Let's have a good food experience</button>
         </div>
 
         <div id="step-5" class="step">
@@ -134,19 +149,20 @@
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-' + stepNumber).classList.add('active');
 
-            // --- FADE IN CHARACTERS ON STEP 3 ---
+            const natsu = document.getElementById('natsu-img');
+            const erza = document.getElementById('erza-img');
+
             if(stepNumber === 3) {
-                document.getElementById('natsu-img').classList.add('show-character');
-                document.getElementById('erza-img').classList.add('show-character');
+                natsu.classList.add('show-character');
+                erza.classList.add('show-character');
             } else {
-                // Fade them out if we move to Step 4 or 5
-                document.getElementById('natsu-img').classList.remove('show-character');
-                document.getElementById('erza-img').classList.remove('show-character');
+                natsu.classList.remove('show-character');
+                erza.classList.remove('show-character');
             }
         }
 
         function startExperience() {
-            audio.play().catch(e => console.log("Audio waiting for interaction"));
+            audio.play().catch(e => console.log("Audio needs user gesture"));
             goToStep(2);
             createHearts();
         }
