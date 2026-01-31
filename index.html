@@ -11,7 +11,6 @@
             --parchment: #fff9e6;
         }
 
-        /* Prevent scrolling on mobile so characters stay put */
         body {
             font-family: 'Georgia', serif;
             background: linear-gradient(135deg, #2b0303 0%, #630d0d 100%);
@@ -20,78 +19,39 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            /* Fix for mobile browser height glitch */
+            min-height: 100dvh; 
             margin: 0;
             overflow: hidden;
-            position: relative;
         }
 
-        /* --- CHARACTER IMAGES (IPHONE OPTIMIZED) --- */
-        .character-img {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px; /* Adjust size as needed */
-            opacity: 0;
-            transition: all 1s ease-in-out;
-            pointer-events: none; /* Allows clicking buttons "through" the image */
-            z-index: 100; /* Forces them to the very front */
-        }
-
-        #natsu-img {
-            top: 5vh; /* 5% from top of screen */
-            transform: translate(-50%, -30px);
-        }
-
-        #erza-img {
-            bottom: 5vh; /* 5% from bottom of screen */
-            transform: translate(-50%, 30px);
-        }
-
-        /* The Animation Class */
-        .show-character {
-            opacity: 1 !important;
-            transform: translate(-50%, 0) !important;
-        }
-
-        /* --- THE MAGIC CARD --- */
+        /* --- THE CARD CONTAINER --- */
         .container {
             background: var(--parchment);
             border: 5px solid var(--guild-gold);
             padding: 1.5rem;
             border-radius: 15px;
-            box-shadow: 0 0 30px rgba(249, 168, 37, 0.5);
-            max-width: 320px;
+            box-shadow: 0 0 40px rgba(0,0,0, 0.5);
+            max-width: 300px; /* Slightly narrower for mobile safety */
             width: 85%;
             text-align: center;
-            position: relative;
-            z-index: 50; /* Card stays below characters if they overlap */
+            position: relative; /* Crucial for attaching images */
+            z-index: 10;
+            margin: auto;
         }
 
-        .step { display: none; }
-        .active { display: block !important; }
-
-        h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.3rem; margin-top: 0; }
-        p { font-size: 0.95rem; line-height: 1.4; }
-        
-        #countdown { 
-            font-weight: bold; 
-            color: var(--fire-red); 
-            margin: 15px 0; 
-            font-family: monospace; 
-            font-size: 1.1rem;
-            letter-spacing: 1px;
+        /* --- CHARACTER IMAGES (Attached to Card) --- */
+        .character-img {
+            position: absolute; /* Stick to the Container, not the screen */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px; /* Safe size for mobile */
+            opacity: 0; 
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease;
+            pointer-events: none; /* Click through them */
+            z-index: -1; /* Behind the card border but visible outside */
         }
 
-        button {
-            display: block; 
-            width: 100%; 
-            padding: 14px; 
-            margin: 10px 0;
-            border: 2px solid var(--guild-gold); 
-            background: white;
-            color: var(--fire-red); 
-            font-weight: bold; 
-            border-radius: 8px;
-            cursor: pointer; 
-            font-family: inherit;
-            font-size
+        /* Natsu: Sits ON TOP of the block */
+        #natsu-img {
+            top: -110px; /* Move him up outside
