@@ -6,92 +6,55 @@
     <title>A Wizard's Valentine Request</title>
     
     <style>
-        :root {
-            --guild-gold: #f9a825;
-            --fire-red: #d32f2f;
-            --parchment: #fff9e6;
-        }
+        <style>
+    /* ... (keep your existing root and body styles) ... */
 
-        body {
-            font-family: 'Georgia', serif;
-            background: linear-gradient(135deg, #2b0303 0%, #630d0d 100%);
-            color: #4e342e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
+    .container {
+        background: var(--parchment);
+        border: 5px solid var(--guild-gold);
+        padding: 1.5rem; /* Slightly smaller padding for mobile */
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(249, 168, 37, 0.4);
+        max-width: 320px; /* Thinner card for iPhone */
+        width: 85%;
+        text-align: center;
+        position: relative;
+        z-index: 20; /* Card is now the middle layer */
+    }
 
-        .container {
-            background: var(--parchment);
-            border: 5px solid var(--guild-gold);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(249, 168, 37, 0.4);
-            max-width: 350px;
-            width: 85%;
-            text-align: center;
-            position: relative;
-            z-index: 10; /* Card stays on top of images */
-        }
+    /* --- IPHONE OPTIMIZED CHARACTERS --- */
+    .character-img {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 160px; /* Slightly smaller for better fit */
+        opacity: 0;
+        transition: all 0.8s ease-out;
+        pointer-events: none;
+        z-index: 25; /* Higher than the container so they sit ON TOP */
+    }
 
-        /* --- CHARACTER VERTICAL LAYOUT --- */
-        .character-img {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 180px; /* Adjust based on your image aspect ratio */
-            opacity: 0;
-            transition: all 1s ease-in-out;
-            pointer-events: none;
-            z-index: 5;
-        }
+    /* Natsu sits at the very top of the screen */
+    #natsu-img {
+        top: 2vh; 
+        transform: translate(-50%, -20px);
+    }
 
-        /* Natsu at the Top */
-        #natsu-img {
-            top: -20px;
-            transform: translate(-50%, -50px);
-        }
+    /* Erza sits at the very bottom of the screen */
+    #erza-img {
+        bottom: 2vh;
+        transform: translate(-50%, 20px);
+    }
 
-        /* Erza at the Bottom */
-        #erza-img {
-            bottom: -20px;
-            transform: translate(-50%, 50px);
-        }
+    /* The "Entrance" animation */
+    .show-character {
+        opacity: 1 !important;
+        transform: translate(-50%, 0) !important;
+    }
+</style>
 
-        /* Reveal Logic */
-        .show-character {
-            opacity: 1;
-        }
-        
-        #natsu-img.show-character {
-            transform: translate(-50%, 0);
-        }
-
-        #erza-img.show-character {
-            transform: translate(-50%, 0);
-        }
-
-        /* --- UI COMPONENTS --- */
-        .step { display: none; }
-        .active { display: block !important; }
-        h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.3rem; margin-bottom: 15px; }
-        
-        button {
-            display: block; width: 100%; padding: 14px; margin: 10px 0;
-            border: 2px solid var(--guild-gold); background: white;
-            color: var(--fire-red); font-weight: bold; border-radius: 8px;
-            cursor: pointer; font-family: inherit; font-size: 0.9rem;
-        }
-        button:hover { background: var(--guild-gold); color: white; }
-
-        .floating-heart {
-            position: fixed; bottom: -50px; color: #ff4d6d; opacity: 0.6; z-index: 1;
-            animation: floatUp 4s linear forwards;
-        }
-        @keyframes floatUp { to { transform: translateY(-110vh) rotate(360deg); } }
+<img src="natsu.png" id="natsu-img" class="character-img" alt="Natsu">
+<img src="erza.png" id="erza-img" class="character-img" alt="Erza">
     </style>
 </head>
 <body>
