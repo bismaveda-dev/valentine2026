@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>A Wizard's Valentine Request</title>
     
     <style>
@@ -20,6 +20,8 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            /* Fix for mobile browser address bar jumps */
+            min-height: 100dvh; 
             margin: 0;
             overflow: hidden;
         }
@@ -30,22 +32,52 @@
             padding: 2rem;
             border-radius: 15px;
             box-shadow: 0 0 30px rgba(249, 168, 37, 0.4);
-            max-width: 400px;
-            width: 90%;
+            max-width: 320px; /* Safe mobile width */
+            width: 85%;
             text-align: center;
             position: relative;
             z-index: 10;
+            /* CRITICAL: Allows images to stick out of the box */
+            overflow: visible; 
         }
 
-        /* The Fix: Hide all steps by default */
-        .step {
-            display: none;
+        /* --- SAFE IMAGE LOGIC --- */
+        .character-img {
+            position: absolute; /* Sticks to the Card, not the screen */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px; /* Adjusted size for mobile balance */
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none; /* Clicks go through the image */
+            z-index: 20; /* Sits on top of the card border */
         }
 
-        /* Only show the active step */
-        .active {
-            display: block !important;
+        /* Stick Natsu to the TOP edge of the card */
+        #natsu-img {
+            top: -110px; 
         }
+
+        /* Stick Erza to the BOTTOM edge of the card */
+        #erza-img {
+            bottom: -110px;
+        }
+
+        /* Animation when they appear */
+        .show-character {
+            opacity: 1 !important;
+        }
+        
+        #natsu-img.show-character {
+            transform: translate(-50%, -10px); /* Pop up slightly */
+        }
+        #erza-img.show-character {
+            transform: translate(-50%, 10px); /* Pop down slightly */
+        }
+        /* ------------------------ */
+
+        .step { display: none; }
+        .active { display: block !important; }
 
         h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.4rem; margin-top: 0; }
         p { line-height: 1.5; }
@@ -66,6 +98,7 @@
             border: 2px solid var(--guild-gold); background: white;
             color: var(--fire-red); font-weight: bold; border-radius: 8px;
             cursor: pointer; font-family: inherit; font-size: 1rem;
+            -webkit-tap-highlight-color: transparent; /* iPhone tap fix */
         }
         button:hover { background: var(--guild-gold); color: white; transform: scale(1.02); }
 
@@ -73,16 +106,14 @@
             position: fixed; bottom: -50px; color: #ff4d6d; opacity: 0.6; z-index: 1;
             animation: floatUp 4s linear forwards;
         }
-        @keyframes floatUp {
-            to { transform: translateY(-110vh) rotate(360deg); }
-        }
+        @keyframes floatUp { to { transform: translateY(-110vh) rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="player" style="position: absolute; top: -9999px;"></div>
-
     <div class="container">
+        <img src="natsu.png" id="natsu-img" class="character-img" alt="Natsu">
+        <img src="erza.png" id="erza-img" class="character-img" alt="Erza">
         
         <div id="step-0" class="step active">
             <h1>Wait a second... 👆</h1>
@@ -108,92 +139,6 @@
 
         <div id="step-3" class="step">
             <h1>Choose Your Armor ⚔️</h1>
-            <p>How are we appearing at the guild?</p>
+            <p>Natsu (Top) or Erza (Bottom)?</p>
             <button onclick="selectOutfit()">Natsu: Clean smart casual look</button>
-            <button onclick="selectOutfit()">Erza: Crop, sexy, hot, ready to mingle</button>
-        </div>
-
-        <div id="step-4" class="step">
-            <span class="disclaimer">If you didn't choose steak, please skip this</span>
-            <h1>The Pierre Special 🍷</h1>
-            <p>PIERRE has a special set menu (Rp1.1 mio). I can't afford it alone... can we use our savings for this?</p>
-            <button onclick="goToStep(5)">Skip (to answer the disclaimer)</button>
-            <button onclick="goToStep(5)">Sure, let's splurge!</button>
-            <button onclick="goToStep(5)">Let's have a good food experience</button>
-        </div>
-
-        <div id="step-5" class="step">
-            <h1>It's a Quest! 📜</h1>
-            <p>Selection recorded. See you on the 14th!</p>
-            <p style="font-size: 2.5rem; margin: 10px 0;">❤️🔥👆</p>
-        </div>
-    </div>
-
-    <script>
-        let chosenFood = "";
-
-// 1. Setup the Audio Object
-// This looks for a file named "valentine.mp3" in your GitHub folder
-const audio = new Audio('valentine.mp3');
-audio.volume = 1.0; 
-
-// 2. Navigation Logic
-function goToStep(stepNumber) {
-    const allSteps = document.querySelectorAll('.step');
-    allSteps.forEach(step => step.classList.remove('active'));
-
-    const target = document.getElementById('step-' + stepNumber);
-    if (target) {
-        target.classList.add('active');
-    }
-}
-
-// 3. The "YES" Trigger (Much more reliable)
-function startExperience() {
-    // Play the MP3
-    audio.play().catch(error => {
-        console.log("Audio failed to play automatically, usually needs a click.");
-    });
-    
-    goToStep(2);
-    createHearts();
-}
-
-function selectFood(food) {
-    chosenFood = food;
-    goToStep(3);
-}
-
-function selectOutfit() {
-    if (chosenFood === 'Steak') {
-        goToStep(4);
-    } else {
-        goToStep(5);
-    }
-}
-
-function createHearts() {
-    for(let i=0; i<15; i++) {
-        setTimeout(() => {
-            const heart = document.createElement('div');
-            heart.className = 'floating-heart';
-            heart.innerHTML = '❤️';
-            heart.style.left = Math.random() * 100 + 'vw';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 4000);
-        }, i * 300);
-    }
-}
-
-// 4. Update Countdown
-(function updateCountdown() {
-    const vDay = new Date("February 14, 2026 00:00:00").getTime();
-    const now = new Date().getTime();
-    const diff = vDay - now;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const el = document.getElementById("countdown");
-    if(el) el.innerHTML = days > 0 ? `${days} DAYS REMAINING` : "HAPPY VALENTINE'S DAY!";
-})();
-    </script>
-</body>
-</html>
+            <button onclick="selectOutfit()">Erza:
