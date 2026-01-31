@@ -2,155 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>A Wizard's Valentine Request</title>
-    
     <style>
-        <style>
-    /* ... (keep your existing root and body styles) ... */
-
-    .container {
-        background: var(--parchment);
-        border: 5px solid var(--guild-gold);
-        padding: 1.5rem; /* Slightly smaller padding for mobile */
-        border-radius: 15px;
-        box-shadow: 0 0 30px rgba(249, 168, 37, 0.4);
-        max-width: 320px; /* Thinner card for iPhone */
-        width: 85%;
-        text-align: center;
-        position: relative;
-        z-index: 20; /* Card is now the middle layer */
-    }
-
-    /* --- IPHONE OPTIMIZED CHARACTERS --- */
-    .character-img {
-        position: fixed;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 160px; /* Slightly smaller for better fit */
-        opacity: 0;
-        transition: all 0.8s ease-out;
-        pointer-events: none;
-        z-index: 25; /* Higher than the container so they sit ON TOP */
-    }
-
-    /* Natsu sits at the very top of the screen */
-    #natsu-img {
-        top: 2vh; 
-        transform: translate(-50%, -20px);
-    }
-
-    /* Erza sits at the very bottom of the screen */
-    #erza-img {
-        bottom: 2vh;
-        transform: translate(-50%, 20px);
-    }
-
-    /* The "Entrance" animation */
-    .show-character {
-        opacity: 1 !important;
-        transform: translate(-50%, 0) !important;
-    }
-</style>
-
-<img src="natsu.png" id="natsu-img" class="character-img" alt="Natsu">
-<img src="erza.png" id="erza-img" class="character-img" alt="Erza">
-    </style>
-</head>
-<body>
-
-    <img src="natsu.png" id="natsu-img" class="character-img" alt="Natsu Style">
-    <img src="erza.png" id="erza-img" class="character-img" alt="Erza Style">
-
-    <div class="container">
-        <div id="step-0" class="step active">
-            <h1>Wait a second... 👆</h1>
-            <p>I'm ordering for later:<br><strong>14th February 2026</strong></p>
-            <button onclick="goToStep(1)">Alrite genius</button>
-        </div>
-
-        <div id="step-1" class="step">
-            <h1>Will you be my valentine? ❤️</h1>
-            <div id="countdown">14 DAYS REMAINING</div>
-            <button onclick="startExperience()">Yes</button>
-            <button onclick="startExperience()">YESS Please!!</button>
-        </div>
-
-        <div id="step-2" class="step">
-            <h1>Guild Feast Selection 🍗</h1>
-            <button onclick="selectFood('Steak')">🥩 Steak</button>
-            <button onclick="selectFood('Sashimi')">🍣 Sashimi Bowl</button>
-            <button onclick="selectFood('Pasta')">🍝 Pasta</button>
-        </div>
-
-        <div id="step-3" class="step">
-            <h1>Choose Your Armor ⚔️</h1>
-            <p>Natsu (Top) or Erza (Bottom)?</p>
-            <button onclick="selectOutfit()">Natsu: Clean smart casual look</button>
-            <button onclick="selectOutfit()">Erza: Crop, sexy, hot, ready to mingle</button>
-        </div>
-
-        <div id="step-4" class="step">
-            <h1 style="font-size: 1.1rem;">The Pierre Special 🍷</h1>
-            <p style="font-size: 0.9rem;">Rp1.1 mio/set. Use our savings?</p>
-            <button onclick="goToStep(5)">Skip</button>
-            <button onclick="goToStep(5)">Sure, let's splurge!</button>
-            <button onclick="goToStep(5)">Let's have a good food experience</button>
-        </div>
-
-        <div id="step-5" class="step">
-            <h1>It's a Quest! 📜</h1>
-            <p>Selection recorded. ❤️🔥👆</p>
-        </div>
-    </div>
-
-    <script>
-        let chosenFood = "";
-        const audio = new Audio('valentine.mp3');
-
-        function goToStep(stepNumber) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('step-' + stepNumber).classList.add('active');
-
-            const natsu = document.getElementById('natsu-img');
-            const erza = document.getElementById('erza-img');
-
-            if(stepNumber === 3) {
-                natsu.classList.add('show-character');
-                erza.classList.add('show-character');
-            } else {
-                natsu.classList.remove('show-character');
-                erza.classList.remove('show-character');
-            }
+        :root {
+            --guild-gold: #f9a825;
+            --fire-red: #d32f2f;
+            --parchment: #fff9e6;
         }
 
-        function startExperience() {
-            audio.play().catch(e => console.log("Audio needs user gesture"));
-            goToStep(2);
-            createHearts();
+        /* Prevent scrolling on mobile so characters stay put */
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2b0303 0%, #630d0d 100%);
+            color: #4e342e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
         }
 
-        function selectFood(food) {
-            chosenFood = food;
-            goToStep(3);
+        /* --- CHARACTER IMAGES (IPHONE OPTIMIZED) --- */
+        .character-img {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px; /* Adjust size as needed */
+            opacity: 0;
+            transition: all 1s ease-in-out;
+            pointer-events: none; /* Allows clicking buttons "through" the image */
+            z-index: 100; /* Forces them to the very front */
         }
 
-        function selectOutfit() {
-            chosenFood === 'Steak' ? goToStep(4) : goToStep(5);
+        #natsu-img {
+            top: 5vh; /* 5% from top of screen */
+            transform: translate(-50%, -30px);
         }
 
-        function createHearts() {
-            for(let i=0; i<15; i++) {
-                setTimeout(() => {
-                    const h = document.createElement('div');
-                    h.className = 'floating-heart';
-                    h.innerHTML = '❤️';
-                    h.style.left = Math.random() * 100 + 'vw';
-                    document.body.appendChild(h);
-                    setTimeout(() => h.remove(), 4000);
-                }, i * 300);
-            }
+        #erza-img {
+            bottom: 5vh; /* 5% from bottom of screen */
+            transform: translate(-50%, 30px);
         }
-    </script>
-</body>
-</html>
+
+        /* The Animation Class */
+        .show-character {
+            opacity: 1 !important;
+            transform: translate(-50%, 0) !important;
+        }
+
+        /* --- THE MAGIC CARD --- */
+        .container {
+            background: var(--parchment);
+            border: 5px solid var(--guild-gold);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(249, 168, 37, 0.5);
+            max-width: 320px;
+            width: 85%;
+            text-align: center;
+            position: relative;
+            z-index: 50; /* Card stays below characters if they overlap */
+        }
+
+        .step { display: none; }
+        .active { display: block !important; }
+
+        h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.3rem; margin-top: 0; }
+        p { font-size: 0.95rem; line-height: 1.4; }
+        
+        #countdown { 
+            font-weight: bold; 
+            color: var(--fire-red); 
+            margin: 15px 0; 
+            font-family: monospace; 
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        button {
+            display: block; 
+            width: 100%; 
+            padding: 14px; 
+            margin: 10px 0;
+            border: 2px solid var(--guild-gold); 
+            background: white;
+            color: var(--fire-red); 
+            font-weight: bold; 
+            border-radius: 8px;
+            cursor: pointer; 
+            font-family: inherit;
+            font-size
