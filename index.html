@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A Wizard's Valentine Request</title>
+    
     <style>
         :root {
             --guild-gold: #f9a825;
@@ -19,39 +20,174 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            /* Fix for mobile browser height glitch */
-            min-height: 100dvh; 
             margin: 0;
             overflow: hidden;
         }
 
-        /* --- THE CARD CONTAINER --- */
         .container {
             background: var(--parchment);
             border: 5px solid var(--guild-gold);
-            padding: 1.5rem;
+            padding: 2rem;
             border-radius: 15px;
-            box-shadow: 0 0 40px rgba(0,0,0, 0.5);
-            max-width: 300px; /* Slightly narrower for mobile safety */
+            box-shadow: 0 0 30px rgba(249, 168, 37, 0.4);
+            max-width: 350px;
             width: 85%;
             text-align: center;
-            position: relative; /* Crucial for attaching images */
-            z-index: 10;
-            margin: auto;
+            position: relative;
+            z-index: 10; /* Card stays on top of images */
         }
 
-        /* --- CHARACTER IMAGES (Attached to Card) --- */
+        /* --- CHARACTER VERTICAL LAYOUT --- */
         .character-img {
-            position: absolute; /* Stick to the Container, not the screen */
+            position: fixed;
             left: 50%;
             transform: translateX(-50%);
-            width: 140px; /* Safe size for mobile */
-            opacity: 0; 
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease;
-            pointer-events: none; /* Click through them */
-            z-index: -1; /* Behind the card border but visible outside */
+            width: 180px; /* Adjust based on your image aspect ratio */
+            opacity: 0;
+            transition: all 1s ease-in-out;
+            pointer-events: none;
+            z-index: 5;
         }
 
-        /* Natsu: Sits ON TOP of the block */
+        /* Natsu at the Top */
         #natsu-img {
-            top: -110px; /* Move him up outside
+            top: -20px;
+            transform: translate(-50%, -50px);
+        }
+
+        /* Erza at the Bottom */
+        #erza-img {
+            bottom: -20px;
+            transform: translate(-50%, 50px);
+        }
+
+        /* Reveal Logic */
+        .show-character {
+            opacity: 1;
+        }
+        
+        #natsu-img.show-character {
+            transform: translate(-50%, 0);
+        }
+
+        #erza-img.show-character {
+            transform: translate(-50%, 0);
+        }
+
+        /* --- UI COMPONENTS --- */
+        .step { display: none; }
+        .active { display: block !important; }
+        h1 { color: var(--fire-red); text-transform: uppercase; font-size: 1.3rem; margin-bottom: 15px; }
+        
+        button {
+            display: block; width: 100%; padding: 14px; margin: 10px 0;
+            border: 2px solid var(--guild-gold); background: white;
+            color: var(--fire-red); font-weight: bold; border-radius: 8px;
+            cursor: pointer; font-family: inherit; font-size: 0.9rem;
+        }
+        button:hover { background: var(--guild-gold); color: white; }
+
+        .floating-heart {
+            position: fixed; bottom: -50px; color: #ff4d6d; opacity: 0.6; z-index: 1;
+            animation: floatUp 4s linear forwards;
+        }
+        @keyframes floatUp { to { transform: translateY(-110vh) rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <img src="natsu.png" id="natsu-img" class="character-img" alt="Natsu Style">
+    <img src="erza.png" id="erza-img" class="character-img" alt="Erza Style">
+
+    <div class="container">
+        <div id="step-0" class="step active">
+            <h1>Wait a second... 👆</h1>
+            <p>I'm ordering for later:<br><strong>14th February 2026</strong></p>
+            <button onclick="goToStep(1)">Alrite genius</button>
+        </div>
+
+        <div id="step-1" class="step">
+            <h1>Will you be my valentine? ❤️</h1>
+            <div id="countdown">14 DAYS REMAINING</div>
+            <button onclick="startExperience()">Yes</button>
+            <button onclick="startExperience()">YESS Please!!</button>
+        </div>
+
+        <div id="step-2" class="step">
+            <h1>Guild Feast Selection 🍗</h1>
+            <button onclick="selectFood('Steak')">🥩 Steak</button>
+            <button onclick="selectFood('Sashimi')">🍣 Sashimi Bowl</button>
+            <button onclick="selectFood('Pasta')">🍝 Pasta</button>
+        </div>
+
+        <div id="step-3" class="step">
+            <h1>Choose Your Armor ⚔️</h1>
+            <p>Natsu (Top) or Erza (Bottom)?</p>
+            <button onclick="selectOutfit()">Natsu: Clean smart casual look</button>
+            <button onclick="selectOutfit()">Erza: Crop, sexy, hot, ready to mingle</button>
+        </div>
+
+        <div id="step-4" class="step">
+            <h1 style="font-size: 1.1rem;">The Pierre Special 🍷</h1>
+            <p style="font-size: 0.9rem;">Rp1.1 mio/set. Use our savings?</p>
+            <button onclick="goToStep(5)">Skip</button>
+            <button onclick="goToStep(5)">Sure, let's splurge!</button>
+            <button onclick="goToStep(5)">Let's have a good food experience</button>
+        </div>
+
+        <div id="step-5" class="step">
+            <h1>It's a Quest! 📜</h1>
+            <p>Selection recorded. ❤️🔥👆</p>
+        </div>
+    </div>
+
+    <script>
+        let chosenFood = "";
+        const audio = new Audio('valentine.mp3');
+
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-' + stepNumber).classList.add('active');
+
+            const natsu = document.getElementById('natsu-img');
+            const erza = document.getElementById('erza-img');
+
+            if(stepNumber === 3) {
+                natsu.classList.add('show-character');
+                erza.classList.add('show-character');
+            } else {
+                natsu.classList.remove('show-character');
+                erza.classList.remove('show-character');
+            }
+        }
+
+        function startExperience() {
+            audio.play().catch(e => console.log("Audio needs user gesture"));
+            goToStep(2);
+            createHearts();
+        }
+
+        function selectFood(food) {
+            chosenFood = food;
+            goToStep(3);
+        }
+
+        function selectOutfit() {
+            chosenFood === 'Steak' ? goToStep(4) : goToStep(5);
+        }
+
+        function createHearts() {
+            for(let i=0; i<15; i++) {
+                setTimeout(() => {
+                    const h = document.createElement('div');
+                    h.className = 'floating-heart';
+                    h.innerHTML = '❤️';
+                    h.style.left = Math.random() * 100 + 'vw';
+                    document.body.appendChild(h);
+                    setTimeout(() => h.remove(), 4000);
+                }, i * 300);
+            }
+        }
+    </script>
+</body>
+</html>
